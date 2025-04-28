@@ -1,131 +1,126 @@
--- BLUE LOCK SCRIPT MOBILE - Feito para diegoxxxplk
+-- Super Menu Mobile
 local player = game.Players.LocalPlayer
-local replicatedStorage = game:GetService("ReplicatedStorage")
-local skills = replicatedStorage:WaitForChild("Skills")
-local soundService = game:GetService("SoundService")
 
 -- Interface
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "BlueLockScriptGUI"
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local frame = Instance.new("Frame", screenGui)
+frame.Position = UDim2.new(0.35, 0, 0.3, 0)
+frame.Size = UDim2.new(0.3, 0, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+frame.BackgroundTransparency = 0.2
+frame.BorderSizePixel = 5
+frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 300, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 85, 255)
-mainFrame.BackgroundTransparency = 0.2
-mainFrame.BorderSizePixel = 0
-
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Position = UDim2.new(0, 0, 0, 0)
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0.2, 0)
 title.BackgroundTransparency = 1
-title.Text = "BLUE LOCK SCRIPT MOBILE"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.SourceSansBold
+title.Text = "Super Menu"
+title.Font = Enum.Font.FredokaOne
 title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-local loadedLabel = Instance.new("TextLabel", mainFrame)
-loadedLabel.Size = UDim2.new(1, 0, 0, 30)
-loadedLabel.Position = UDim2.new(0, 0, 0, 50)
-loadedLabel.BackgroundTransparency = 1
-loadedLabel.Text = "✅ Carregado com sucesso!"
-loadedLabel.TextColor3 = Color3.new(0, 1, 0)
-loadedLabel.Font = Enum.Font.SourceSans
-loadedLabel.TextScaled = true
-
--- Funções
-local function activateSkill(skillName)
-    local skill = skills:FindFirstChild(skillName)
-    if skill then
-        skill:FireServer()
-    else
-        warn("Skill não encontrada: " .. skillName)
-    end
+-- Função botão
+local function criarBotao(text, posY, func)
+    local button = Instance.new("TextButton", frame)
+    button.Size = UDim2.new(0.8, 0, 0.15, 0)
+    button.Position = UDim2.new(0.1, 0, posY, 0)
+    button.BackgroundColor3 = Color3.fromRGB(0, 60, 255)
+    button.Text = text
+    button.Font = Enum.Font.FredokaOne
+    button.TextScaled = true
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.MouseButton1Click:Connect(func)
 end
 
-local function sprintInfinito()
-    while true do
-        activateSkill("SprintSkill")
-        wait(2)
-    end
-end
-
-local function superChute()
-    activateSkill("ShootSkill")
-    -- Efeito visual azul
-    local explosion = Instance.new("Explosion")
-    explosion.Position = player.Character.HumanoidRootPart.Position
-    explosion.BlastRadius = 10
-    explosion.BlastPressure = 5000
-    explosion.ExplosionType = Enum.ExplosionType.NoCraters
-    explosion.Parent = workspace
-end
-
-local function zantetsuMode()
-    while true do
-        activateSkill("AccelerationSkill")
-        wait(3)
-    end
-end
-
-local function bachiraMode()
-    while true do
-        activateSkill("DribbleSkill")
-        wait(4)
-    end
-end
-
-local function autoGoal()
-    while true do
-        if workspace:FindFirstChild("Ball") then
-            local ball = workspace.Ball
-            ball.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -5)
+-- Ultimate infinita (botão)
+local ultimateAtivado = false
+criarBotao("Ultimate Infinita", 0.25, function()
+    ultimateAtivado = not ultimateAtivado
+    if ultimateAtivado then
+        while ultimateAtivado do
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 32
+                humanoid.JumpPower = 100
+            end
+            task.wait(1)
         end
-        wait(1)
-    end
-end
-
-local musicPlaying = false
-local backgroundMusic
-
-local function toggleMusic()
-    if not musicPlaying then
-        backgroundMusic = Instance.new("Sound", soundService)
-        backgroundMusic.SoundId = "rbxassetid://9128579874" -- Música épica
-        backgroundMusic.Volume = 0.3
-        backgroundMusic.Looped = true
-        backgroundMusic:Play()
-        musicPlaying = true
     else
-        if backgroundMusic then
-            backgroundMusic:Destroy()
+        if player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 16
+                humanoid.JumpPower = 50
+            end
         end
-        musicPlaying = false
     end
-end
+end)
 
--- Botões
-local buttons = {
-    {Name = "Sprint Infinito", Action = sprintInfinito},
-    {Name = "Super Chute", Action = superChute},
-    {Name = "Modo Zantetsu", Action = zantetsuMode},
-    {Name = "Modo Bachira", Action = bachiraMode},
-    {Name = "Auto Goal", Action = autoGoal},
-    {Name = "Música ON/OFF", Action = toggleMusic}
-}
+-- Música épica (botão)
+local musicaAtivada = false
+local sound
+criarBotao("Música Épica", 0.45, function()
+    musicaAtivada = not musicaAtivada
+    if musicaAtivada then
+        sound = Instance.new("Sound", workspace)
+        sound.SoundId = "rbxassetid://1837635128" -- Link da música (pode mudar depois)
+        sound.Volume = 2
+        sound.Looped = true
+        sound:Play()
+    else
+        if sound then
+            sound:Stop()
+            sound:Destroy()
+        end
+    end
+end)
 
-for i, info in ipairs(buttons) do
-    local btn = Instance.new("TextButton", mainFrame)
-    btn.Size = UDim2.new(1, -20, 0, 40)
-    btn.Position = UDim2.new(0, 10, 0, 90 + (i - 1) * 50)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextScaled = true
-    btn.Text = info.Name
-    btn.MouseButton1Click:Connect(function()
-        coroutine.wrap(info.Action)()
-    end)
-end
+-- Super chute + explosão azul
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.ButtonR2 or input.UserInputType == Enum.UserInputType.Touch then
+        local ball = workspace:FindFirstChild("SoccerBall") or workspace:FindFirstChild("Ball")
+        if ball and (ball.Position - player.Character.HumanoidRootPart.Position).Magnitude < 10 then
+            ball.Velocity = (ball.Position - player.Character.HumanoidRootPart.Position).unit * 300
+            -- Efeito explosão azul
+            local explosion = Instance.new("Explosion")
+            explosion.Position = ball.Position
+            explosion.BlastPressure = 0
+            explosion.BlastRadius = 5
+            explosion.ExplosionType = Enum.ExplosionType.NoCraters
+            explosion.Parent = workspace
+            explosion.Visible = true
+        end
+    end
+end)
 
-print("BLUE LOCK SCRIPT MOBILE carregado!")
+-- Sprint infinito
+task.spawn(function()
+    while task.wait(0.5) do
+        if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = 25
+        end
+    end
+end)
+
+-- Drible automático
+task.spawn(function()
+    while task.wait(3) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(20), 0)
+        end
+    end
+end)
+
+-- Roubo de bola automático
+task.spawn(function()
+    while task.wait(1) do
+        local ball = workspace:FindFirstChild("SoccerBall") or workspace:FindFirstChild("Ball")
+        if ball and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if (ball.Position - player.Character.HumanoidRootPart.Position).Magnitude < 5 then
+                ball.CFrame = player.Character.HumanoidRootPart.CFrame
+            end
+        end
+    end
+end)
+
+print("Super Menu carregado!")
